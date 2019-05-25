@@ -1,0 +1,13 @@
+{
+  "name": "superflow",
+  "version": "0.1",
+  "main": "index.js",
+  "repository": "https://github.com/uraniawizard/superflow",
+  "author": "Maurits Dorlandt",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
