@@ -9,6 +9,7 @@
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
   <script src="index.js"></script>
+  <link href="style.css" type="text/css" rel="stylesheet" />
 </head>
 
 <body>
@@ -25,6 +26,12 @@
       </div>
     </form>
     <h3>Water level: <span id="water-level"></span></h3>
+    <svg id="visual">
+      <rect id="sky" class="sky"/>
+      <rect id="ground"/>
+      <rect id="flow-area" class="sky"/>
+      <rect id="water" />
+    </svg>
   </div>
 </body>
 
