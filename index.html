@@ -18,18 +18,18 @@
     <form>
       <div class="form-group">
         <label for="width">Width of the summerbed (m)</label>
-        <input id="width" class="form-control" type="number">
+        <input id="width" class="form-control" type="number" value="200">
       </div>
       <div class="form-group">
         <label for="flow-rate">Flow rate (m<sup>3</sup>/s)</label>
-        <input id="flow-rate" class="form-control" type="number">
+        <input id="flow-rate" class="form-control" type="number" value="800">
       </div>
     </form>
     <h3>Water level: <span id="water-level"></span></h3>
     <svg id="visual">
       <rect id="sky" class="sky" />
-      <rect id="ground" />
-      <rect id="flow-area" class="sky" />
+      <rect id="ground" y="50%" />
+      <rect id="flow-area" y="50%" class="sky" />
       <rect id="water" />
     </svg>
   </div>
