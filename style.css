@@ -27,6 +27,36 @@
   fill: blue;
 }
 
+#visual #winter-dyke-left {
+  fill: darkolivegreen;
+  x: 10%;
+  y: 40%;
+  height: 10%;
+  width: 5%;
+}
+#visual #winter-dyke-right {
+  fill: darkolivegreen;
+  x: 30%;
+  y: 40%;
+  height: 10%;
+  width: 5%;
+}
+    
+#visual #summer-dyke-left {
+  fill: darkolivegreen;
+  x: 70%;
+  y: 40%;
+  height: 10%;
+  width: 5%;
+}
+
+#visual #summer-dyke-right {
+  fill: darkolivegreen;
+  x: 90%;
+  y: 40%;
+  height: 10%;
+  width: 5%;
+
 #visual #reference-height {
   stroke:white;
   stroke-width:3;
