@@ -30,33 +30,33 @@
 #visual #winter-dyke-left {
   fill: darkolivegreen;
   x: 10%;
-  y: 40%;
-  height: 10%;
-  width: 5%;
+  y: 43%;
+  height: 7%;
+  width: 3%;
 }
 #visual #winter-dyke-right {
   fill: darkolivegreen;
-  x: 30%;
-  y: 40%;
-  height: 10%;
-  width: 5%;
+  x: 87.5%;
+  y: 43%;
+  height: 7%;
+  width: 3%;
 }
     
 #visual #summer-dyke-left {
   fill: darkolivegreen;
-  x: 70%;
-  y: 40%;
-  height: 10%;
-  width: 5%;
+  x: 25%;
+  y: 46%;
+  height: 4%;
+  width: 2%;
 }
 
 #visual #summer-dyke-right {
   fill: darkolivegreen;
-  x: 90%;
-  y: 40%;
-  height: 10%;
-  width: 5%;
-
+  x: 72.5%;
+  y: 46%;
+  height: 4%;
+  width: 2%;
+}
 #visual #reference-height {
   stroke:white;
   stroke-width:3;
