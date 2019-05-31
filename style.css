@@ -9,18 +9,18 @@
 }
 
 #visual #sky {
-  width: 100%;
-  height: 100%;
+  width: 1000;
+  height: 1000;
 }
 
 #visual #ground {
   fill: darkolivegreen;
-  height: 50%;
-  width: 100%;
+  height: 500;
+  width: 1000;
 }
 
 #visual #flow-area {
-  height: 25%;
+  height: 250;
 }
 
 #visual #water {
@@ -29,36 +29,29 @@
 
 #visual #winter-dyke-left {
   fill: darkolivegreen;
-  x: 10%;
-  y: 43%;
-  height: 7%;
-  width: 3%;
+  height: 590;
+  width: 30;
 }
+
 #visual #winter-dyke-right {
   fill: darkolivegreen;
-  x: 87.5%;
-  y: 43%;
-  height: 7%;
-  width: 3%;
+  height: 590;
+  width: 30;
 }
     
 #visual #summer-dyke-left {
   fill: darkolivegreen;
-  x: 25%;
-  y: 46%;
-  height: 4%;
-  width: 2%;
+  height: 540;
+  width: 20;
 }
 
 #visual #summer-dyke-right {
   fill: darkolivegreen;
-  x: 72.5%;
-  y: 46%;
-  height: 4%;
-  width: 2%;
+  height: 540;
+  width: 20;
 }
 #visual #reference-height {
   stroke:white;
-  stroke-width:3;
+  stroke-width: 3;
   stroke-dasharray:5;
 }
