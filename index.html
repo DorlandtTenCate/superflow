@@ -69,8 +69,11 @@
   <svg id="visual" preserveAspectRatio="none" viewBox="0 0 1000 1000">
     <rect id="sky" class="sky" />
     <rect id="ground" y="500" />
-    <path id="flow-area" class="sky" />
-    <rect id="water" />
+    <mask id="flow-area-mask">
+      <path id="flow-area" />
+    </mask>
+    <rect id="flow-butt" mask="url(#flow-area-mask)" x="0" y="0" style="width: 100%; height:100%" class="sky" />
+    <rect id="water" mask="url(#flow-area-mask)"  />
     <rect id="summer-dyke-left"  x="250" y="460" />
     <rect id="summer-dyke-right" x="870" y="460" />
     <rect id="winter-dyke-left" x="50" y="410" />
