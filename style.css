@@ -20,6 +20,7 @@
 }
 
 #visual #flow-area {
+  fill: white;
   height: 250;
 }
 
@@ -38,7 +39,7 @@
   height: 590;
   width: 30;
 }
-    
+
 #visual #summer-dyke-left {
   fill: darkolivegreen;
   height: 540;

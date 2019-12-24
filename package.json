@@ -5,9 +5,11 @@
   "repository": "https://github.com/uraniawizard/superflow",
   "author": "Maurits Dorlandt",
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "live-server": "^1.2.1"
+  },
+  "scripts": {
+    "develop": "live-server"
   }
 }
