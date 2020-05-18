@@ -6,17 +6,18 @@ import './App.css';
 
 function App() {
   const state = {
-    fr: useState(800),
-    lwdh: useState(4),
-    lwdd: useState(15),
-    lsdh: useState(2.5),
-    lsdd: useState(5),
-    rsdh: useState(2.5),
-    rsdd: useState(5),
-    rwdh: useState(4),
-    rwdd: useState(15),
-    sbd: useState(3.5),
-    sbw: useState(10),
+    q: useState(150),
+    d: useState(3.5),
+    w: useState(10),
+    v: useState(6),
+    lwh: useState(4),
+    lwd: useState(15),
+    lsh: useState(2.5),
+    lsd: useState(5),
+    rsh: useState(2.5),
+    rsd: useState(5),
+    rwh: useState(4),
+    rwd: useState(15),
   };
 
   return (
