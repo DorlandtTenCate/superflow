@@ -5,7 +5,9 @@ dependencies:
   react: 16.13.1
   react-dom: 16.13.1_react@16.13.1
   react-scripts: 3.4.1
+  solv.js: 1.3.2
 devDependencies:
+  '@fullhuman/postcss-purgecss': 2.3.0
   autoprefixer: 9.7.6
   postcss-cli: 7.1.1
   prettier: 2.0.5
@@ -1194,6 +1196,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-q4zYAn8L9olA5uneaLhxkHRBoug9dnAqytbdX9R5dbzSORobhYr1yGR2JN3Q1UMd5RB0apm1NvJekHaymal/BQ==
+  /@fullhuman/postcss-purgecss/2.3.0:
+    dependencies:
+      postcss: 7.0.32
+      purgecss: 2.3.0
+    dev: true
+    resolution:
+      integrity: sha512-qnKm5dIOyPGJ70kPZ5jiz0I9foVOic0j+cOzNDoo8KoCf6HjicIZ99UfO2OmE7vCYSKAAepEwJtNzpiiZAh9xw==
   /@hapi/address/2.1.4:
     dev: false
     resolution:
@@ -9031,6 +9040,16 @@ packages:
       node: '>=6.0.0'
     resolution:
       integrity: sha512-nu/0m+NtIzoubO+xdAlwZl/u5S5vi/y6BCsoL8D+8IxsD3XvBS8X4YEADNIVXKVuQvduiucnRv+vPIqj56EGMQ==
+  /postcss/7.0.32:
+    dependencies:
+      chalk: 2.4.2
+      source-map: 0.6.1
+      supports-color: 6.1.0
+    dev: true
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-03eXong5NLnNCD05xscnGKGDZ98CyzoqPSMjOe6SuoQY7Z2hIj0Ld1g/O/UQRuOle2aRtiIRDg9tDcTGAkLfKw==
   /prelude-ls/1.1.2:
     dev: false
     engines:
@@ -9214,6 +9233,16 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-wngRSLW1dpNr8kr3TL9nTJMyTFI5BiRiaUUEys5M1CA4zEHLF25fRHoshEeDqmhstaNTOddmpYM34zRrUtEGbQ==
+  /purgecss/2.3.0:
+    dependencies:
+      commander: 5.1.0
+      glob: 7.1.6
+      postcss: 7.0.32
+      postcss-selector-parser: 6.0.2
+    dev: true
+    hasBin: true
+    resolution:
+      integrity: sha512-BE5CROfVGsx2XIhxGuZAT7rTH9lLeQx/6M0P7DTXQH4IUc3BBzs9JUzt4yzGf3JrH9enkeq6YJBe9CTtkm1WmQ==
   /q/1.5.1:
     dev: false
     engines:
@@ -10259,6 +10288,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-V48klKZl8T6MzatbLlzzRNhMepEys9Y4oGFpypBFFn1gLI/QQ9HtLLyWJNbPlwGLelOVOEijUbTTJeLLI59jLw==
+  /solv.js/1.3.2:
+    dev: false
+    resolution:
+      integrity: sha512-BnoidCzrFojJ6SjsZj/aCtyps8NaOnkxHwndu5stY8hGzQzTCzrE6HaVFvN6KjxtEDrbzGmir9Uh0L2yzNAU4g==
   /sort-keys/1.1.2:
     dependencies:
       is-plain-obj: 1.1.0
@@ -11795,6 +11828,7 @@ packages:
     resolution:
       integrity: sha512-92O1HWEjw27sBfgmXiixJWT5hRBp2eobqXicLtPBIDBhYB+1HpwZlXmbW2luivBJHBzki+7VyCLRtAkScbTBQA==
 specifiers:
+  '@fullhuman/postcss-purgecss': ^2.3.0
   '@testing-library/jest-dom': ^5.7.0
   '@testing-library/react': ^10.0.4
   '@testing-library/user-event': ^10.3.0
@@ -11804,4 +11838,5 @@ specifiers:
   react: ^16.13.1
   react-dom: ^16.13.1
   react-scripts: 3.4.1
+  solv.js: ^1.3.2
   tailwindcss: ^1.4.6

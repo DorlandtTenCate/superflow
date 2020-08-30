@@ -2,7 +2,7 @@ import React from 'react';
 import Input from './input';
 
 export default function Sidebar({ state }) {
-  const { q, v, d, w, lwh, lwd, lsh, lsd, rsh, rsd, rwh, rwd } = state;
+  const { q, n, d, w, lwh, lwd, lsh, lsd, rsh, rsd, rwh, rwd } = state;
   return (
     <div class="sidebar">
       <h2 className="font-bold text-2xl">Summer bed</h2>
@@ -16,7 +16,7 @@ export default function Sidebar({ state }) {
           }
           value={q}
         />
-        <Input className="w-full lg:w-1/2" label="Water velocity in m/s" value={v} />
+        <Input className="w-full lg:w-1/2" label="Roughness coefficient (Manning)" value={n} />
       </div>
 
       <div className="lg:flex">
@@ -24,7 +24,7 @@ export default function Sidebar({ state }) {
         <Input className="w-full lg:w-1/2" label="Depth of the summer bed in m" value={d} />
       </div>
       <hr class="mt-4" />
-      <h2 className="font-bold text-2xl">Dyke heights</h2>
+      <h2 className="font-bold text-2xl">Dykes</h2>
       <div className="lg:flex">
         <Input className="w-full lg:w-1/2 mr-8" label="Height of left winter dyke" value={lwh} />
         <Input className="w-full lg:w-1/2" label="Distance of left winter dyke" value={lwd} />

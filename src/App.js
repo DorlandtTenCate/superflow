@@ -9,7 +9,7 @@ function App() {
     q: useState(150),
     d: useState(3.5),
     w: useState(10),
-    v: useState(6),
+    n: useState(0.035),
     lwh: useState(4),
     lwd: useState(15),
     lsh: useState(2.5),
