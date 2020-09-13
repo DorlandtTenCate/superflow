@@ -11,18 +11,19 @@ export default function FlowModel({ state }) {
     rsd: [rsd],
     rwh: [rwh],
     rwd: [rwd],
-    d: [d],
-    w: [w],
+    sbd: [sbd],
+    sbw: [sbw],
     q: [q],
     n: [n],
+    s: [s],
   } = state;
 
   // Value of highest dyke
   const maxDh = Math.max(...[lwh, lsh, rsh, rwh]);
 
   const scale = {
-    width: lwh + lwd + 0.5 + w + 0.5 + rwd + rwh,
-    height: maxDh + d + 1,
+    width: lwh + lwd + 0.5 + sbw + 0.5 + rwd + rwh,
+    height: maxDh + sbd + 1,
   };
 
   // Maintain aspect ratio
@@ -46,9 +47,43 @@ export default function FlowModel({ state }) {
   // Convert metric right to SVG left
   const _r = (m) => _l(scale.width - m);
 
-  function Q(d) {
-    if (d < 0) return -1;
-    return w * d * (1 / n) * Math.pow((w * d) / (w + 2 * d), 2 / 3) * Math.sqrt(0.1);
+  /**
+   * Calculate using Manning's formula. Assumes n and s to be set in scope
+   *
+   * @param {*} a Area of the water flow (in m^2)
+   * @param {*} p Wetted perimeter (in m)
+   * @returns Flow rate in m/s
+   */
+  function Q(a, p) {
+    if (a < 0 || p < 0) return -1;
+
+    return (1 / n) * a * Math.pow(a / p, 2 / 3) * Math.sqrt(s);
+  }
+
+  // Calculates Flow Rate Q for depth d inside summerbed
+  function QSummerBed(d) {
+    const a = sbw * d;
+
+    // Wet perimeter W
+    const p = sbw + 2 * d;
+
+    return Q(a, p);
+  }
+
+  const sph = Math.min(lsh, rsh);
+  const spw = lsd + rsd + sbw;
+
+  function QSummerPlains(d) {
+    // Don't bother with the plains if the water fits in the summer bed
+    // if (q <= QSummerBed(sbd)) return QSummerBed(d);
+    if (d <= sbd) return QSummerBed(d);
+
+    d -= sbd;
+
+    const p = spw + 2 * d + 2 * sbd;
+    const a = sbw * sbd + spw * d;
+
+    return Q(a, p);
   }
 
   // const waterLevel = goalSeek({
@@ -61,19 +96,19 @@ export default function FlowModel({ state }) {
   //   percentTolerance: 0.1,
   // });
 
-  let waterLevel;
+  let summerPlainsLevel;
 
   try {
-    waterLevel = solve(Q, q);
+    summerPlainsLevel = solve(QSummerPlains, q);
   } catch {
-    waterLevel = 0;
+    summerPlainsLevel = 0;
   }
 
   function Sky() {
     return <rect className="text-blue-300 fill-current w-full h-full" />;
   }
   function Ground() {
-    return <rect className="text-yellow-900 fill-current h-full w-full" y={_b(d)} />;
+    return <rect className="text-yellow-900 fill-current h-full w-full" y={_b(sbd)} />;
   }
   function Dyke({ side, distance, height }) {
     return (
@@ -82,10 +117,10 @@ export default function FlowModel({ state }) {
         cx={
           side === 'left'
             ? _l(lwh + lwd - distance - height / 2)
-            : _l(lwh + lwd + 0.5 + w + 0.5 + distance + height / 2)
+            : _l(lwh + lwd + 0.5 + sbw + 0.5 + distance + height / 2)
         }
         // cx={side === 'left' ? l(lwd - distance) : l(lwd + distance + w)}
-        cy={_b(d) + _s(height)}
+        cy={_b(sbd) + _s(height)}
         rx={_s(height / 2)}
         ry={_s(height * 2)}
       />
@@ -94,8 +129,15 @@ export default function FlowModel({ state }) {
 
   return (
     <div class="flow-model">
+      <p>Water level: {summerPlainsLevel}m</p>
       <svg className="w-full" viewBox="0 0 1000 500">
         <Sky />
+        <rect
+          className="text-blue-800 fill-current h-full"
+          width={_s(spw + 1 + lsh)}
+          x={_l(lwh + lwd - lsd - lsh / 2)}
+          y={_b(summerPlainsLevel)}
+        ></rect>
         <Dyke side="left" height={lwh} distance={lwd} />
         <Dyke side="left" height={lsh} distance={lsd} />
         <Dyke side="right" height={rsh} distance={rsd} />
@@ -104,24 +146,28 @@ export default function FlowModel({ state }) {
         <mask id="flow-area-mask">
           <path
             className="text-white h-48 fill-current"
-            d={`M ${_l(lwh + lwd)} ${_b(d)}
+            d={`M ${_l(lwh + lwd)} ${_b(sbd)}
               a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} ${_s(0.5)}
-              v ${_s(d) - _s(1)}
+              v ${_s(sbd) - _s(1)}
               a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} ${_s(0.5)}
-              h ${_s(w) - _s(1)}
+              h ${_s(sbw) - _s(1)}
               a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} -${_s(0.5)}
-              v ${-_s(d) + _s(1)}
+              v ${-_s(sbd) + _s(1)}
               a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} -${_s(0.5)}
               z`}
           />
         </mask>
         <rect className="text-blue-300 fill-current w-full h-full" mask="url(#flow-area-mask)" />
-        <rect className="text-blue-800 fill-current w-full h-full" mask="url(#flow-area-mask)" y={_b(waterLevel)} />
+        <rect
+          className="text-blue-800 fill-current w-full h-full"
+          mask="url(#flow-area-mask)"
+          y={_b(summerPlainsLevel)}
+        />
         {/* <rect id="winter-dyke-left" x="50" y="410" />
         <rect id="summer-dyke-left" x="250" y="460" />
         <rect id="summer-dyke-right" x="870" y="460" />
-        <rect id="winter-dyke-right" x="950" y="410" />
-        <line id="reference-height" x1="0" y1="950" x2="1000" y2="950" /> */}
+        <rect id="winter-dyke-right" x="950" y="410" />} */}
+        <line id="reference-height" x1="0" y1="950" x2="1000" y2="950" />
       </svg>
     </div>
   );
