@@ -18,7 +18,10 @@ export default function FlowModel({ state }) {
     s: [s],
   } = state;
 
-  // Value of highest dyke
+  // ***********
+  // * Scaling *
+  // ***********
+  // Height of highest dyke
   const maxDh = Math.max(...[lwh, lsh, rsh, rwh]);
 
   const scale = {
@@ -26,7 +29,7 @@ export default function FlowModel({ state }) {
     height: maxDh + sbd + 1,
   };
 
-  // Maintain aspect ratio
+  // Maintain 2:1 aspect ratio
   if (scale.width < scale.height * 2) scale.width = scale.height * 2;
   if (scale.height < scale.width / 2) scale.height = scale.width / 2;
 
@@ -46,6 +49,19 @@ export default function FlowModel({ state }) {
 
   // Convert metric right to SVG left
   const _r = (m) => _l(scale.width - m);
+
+  const sph = Math.min(lsh, rsh);
+  const spw = lsd + rsd + sbw;
+
+  const wph = Math.min(lwh, rwh);
+
+  const firstWinterPlain = rsh > lsh ? 'left' : lsh == rsh ? 'both' : 'right';
+
+  const flowRates = [];
+  flowRates.push({ summerBed: QSummerBed(sbd) });
+  flowRates.push({ summerPlains: QSummerPlains(sbd + sph) });
+
+  // if (firstWinterPlain == 'both') flowRates.push({ winterPlains: QWinterPlains(wph) });
 
   /**
    * Calculate using Manning's formula. Assumes n and s to be set in scope
@@ -70,9 +86,6 @@ export default function FlowModel({ state }) {
     return Q(a, p);
   }
 
-  const sph = Math.min(lsh, rsh);
-  const spw = lsd + rsd + sbw;
-
   function QSummerPlains(d) {
     // Don't bother with the plains if the water fits in the summer bed
     // if (q <= QSummerBed(sbd)) return QSummerBed(d);
@@ -86,15 +99,7 @@ export default function FlowModel({ state }) {
     return Q(a, p);
   }
 
-  // const waterLevel = goalSeek({
-  //   fn: Q,
-  //   goal: q,
-  //   fnParams: [0],
-  //   maxIterations: 1000,
-  //   maxStep: 10,
-  //   independentVariableIdx: 0,
-  //   percentTolerance: 0.1,
-  // });
+  function QFirstWinterPlain(d) {}
 
   let summerPlainsLevel;
 
@@ -127,6 +132,33 @@ export default function FlowModel({ state }) {
     );
   }
 
+  function FlowArea() {
+    return (
+      <>
+        <mask id="flow-area-mask">
+          <path
+            className="text-white h-48 fill-current"
+            d={`M ${_l(lwh + lwd)} ${_b(sbd)}
+        a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} ${_s(0.5)}
+        v ${_s(sbd) - _s(1)}
+        a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} ${_s(0.5)}
+        h ${_s(sbw) - _s(1)}
+        a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} -${_s(0.5)}
+        v ${-_s(sbd) + _s(1)}
+        a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} -${_s(0.5)}
+        z`}
+          />
+        </mask>
+        <rect className="text-blue-300 fill-current w-full h-full" mask="url(#flow-area-mask)" />
+        <rect
+          className="text-blue-800 fill-current w-full h-full"
+          mask="url(#flow-area-mask)"
+          y={_b(summerPlainsLevel)}
+        />
+      </>
+    );
+  }
+
   return (
     <div class="flow-model">
       <p>Water level: {summerPlainsLevel}m</p>
@@ -143,30 +175,7 @@ export default function FlowModel({ state }) {
         <Dyke side="right" height={rsh} distance={rsd} />
         <Dyke side="right" height={rwh} distance={rwd} />
         <Ground />
-        <mask id="flow-area-mask">
-          <path
-            className="text-white h-48 fill-current"
-            d={`M ${_l(lwh + lwd)} ${_b(sbd)}
-              a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} ${_s(0.5)}
-              v ${_s(sbd) - _s(1)}
-              a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} ${_s(0.5)}
-              h ${_s(sbw) - _s(1)}
-              a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} -${_s(0.5)}
-              v ${-_s(sbd) + _s(1)}
-              a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} -${_s(0.5)}
-              z`}
-          />
-        </mask>
-        <rect className="text-blue-300 fill-current w-full h-full" mask="url(#flow-area-mask)" />
-        <rect
-          className="text-blue-800 fill-current w-full h-full"
-          mask="url(#flow-area-mask)"
-          y={_b(summerPlainsLevel)}
-        />
-        {/* <rect id="winter-dyke-left" x="50" y="410" />
-        <rect id="summer-dyke-left" x="250" y="460" />
-        <rect id="summer-dyke-right" x="870" y="460" />
-        <rect id="winter-dyke-right" x="950" y="410" />} */}
+        <FlowArea />
         <line id="reference-height" x1="0" y1="950" x2="1000" y2="950" />
       </svg>
     </div>
