@@ -101,7 +101,9 @@ export default function FlowModel({ state }) {
 
   function QFirstWinterPlain(d) {}
 
-  let summerPlainsLevel;
+  let summerPlainsLevel, leftWinterPlainLevel, RightWinterPlainLevel;
+
+  leftWinterPlainLevel = 9; // FIXME
 
   try {
     summerPlainsLevel = solve(QSummerPlains, q);
@@ -130,6 +132,32 @@ export default function FlowModel({ state }) {
         ry={_s(height * 2)}
       />
     );
+  }
+
+  function SummerPlains() {
+    return (
+      <rect
+        className="text-blue-800 fill-current h-full"
+        width={_s(spw + 1 + lsh)} // FIXME: Is this correct, or should it be .5lsh + .5rsh?
+        x={_l(lwh + lwd - lsd - lsh / 2)}
+        y={_b(summerPlainsLevel)}
+      />
+    );
+  }
+
+  function LeftWinterPlain() {
+    return (
+      <rect
+        className="text-blue-800 fill-current h-full"
+        width={_s(lwh / 2 + lwd - lsd - lsh / 2)}
+        x={_l(lwh / 2)}
+        y={_b(leftWinterPlainLevel)}
+      />
+    );
+  }
+
+  function RightWinterPlain() {
+    return <></>;
   }
 
   function FlowArea() {
@@ -164,12 +192,9 @@ export default function FlowModel({ state }) {
       <p>Water level: {summerPlainsLevel}m</p>
       <svg className="w-full" viewBox="0 0 1000 500">
         <Sky />
-        <rect
-          className="text-blue-800 fill-current h-full"
-          width={_s(spw + 1 + lsh)}
-          x={_l(lwh + lwd - lsd - lsh / 2)}
-          y={_b(summerPlainsLevel)}
-        ></rect>
+        <LeftWinterPlain />
+        <SummerPlains />
+        <RightWinterPlain />
         <Dyke side="left" height={lwh} distance={lwd} />
         <Dyke side="left" height={lsh} distance={lsd} />
         <Dyke side="right" height={rsh} distance={rsd} />
