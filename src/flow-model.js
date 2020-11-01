@@ -67,6 +67,23 @@ export default function FlowModel({ state }) {
     return (1 / manningCoefficient) * a * Math.pow(a / p, 2 / 3) * Math.sqrt(slope);
   }
 
+  const [shortSummerDyke, tallSummerDyke] = [
+    {
+      side: 'left',
+      height: leftSummerHeight,
+      summerDistance: leftSummerDistance,
+      winterDistance: leftWinterDistance,
+      oppositeSummerDistance: rightSummerDistance,
+    },
+    {
+      side: 'right',
+      height: rightSummerHeight,
+      summerDistance: rightSummerDistance,
+      winterDistance: leftWinterDistance,
+      oppositeSummerDistance: leftSummerDistance,
+    },
+  ].sort((a, b) => a.height - b.height);
+
   const flowAreas = [];
 
   // Calculate A and P for a full summer bed
@@ -97,49 +114,31 @@ export default function FlowModel({ state }) {
     const lowerWinterPlainsPerimeter = lowerWinterPlainsVerticalPerimeter + winterPlainsWidth;
     flowAreas.push({ type: 'lowerWinterPlains', maxRate: Q(lowerWinterPlainsArea, lowerWinterPlainsPerimeter) });
   } else {
-    const summerDykes = [
-      {
-        side: 'left',
-        height: leftSummerHeight,
-        winterDistance: leftWinterDistance,
-        oppositeSummerDistance: rightSummerDistance,
-      },
-      {
-        side: 'right',
-        height: rightSummerHeight,
-        winterDistance: rightWinterDistance,
-        oppositeSummerDistance: leftSummerDistance,
-      },
-    ].sort((a, b) => a.height - b.height);
-
     // Calculate max A and P for outside of lowest summer dyke
-    // lhwp = lower half winter plain
-    const halfWinterPlainsWidth =
-      summerBedWidth + summerDykes[0].winterDistance + summerDykes[0].oppositeSummerDistance;
-    const lowerHalfWinterPlainsArea = summerBedArea + halfWinterPlainsWidth * summerPlainsHeight;
-    const lowerHalfWinterPlainsVerticalPerimeter = 2 * summerBedDepth + 4 * summerPlainsHeight;
-    const lowerHalfWinterPlainsPerimeter = lowerHalfWinterPlainsVerticalPerimeter + halfWinterPlainsWidth;
+    const winterPlainWidth = summerBedWidth + shortSummerDyke.winterDistance + shortSummerDyke.oppositeSummerDistance;
+    const lowerWinterPlainArea = summerBedArea + winterPlainWidth * summerPlainsHeight;
+    const lowerWinterPlainVerticalPerimeter = 2 * summerBedDepth + 4 * summerPlainsHeight;
+    const lowerWinterPlainPerimeter = lowerWinterPlainVerticalPerimeter + winterPlainWidth;
     flowAreas.push({
-      type: 'lowerHalfWinterPlains',
-      maxRate: Q(lowerHalfWinterPlainsArea, lowerHalfWinterPlainsPerimeter),
+      type: 'lowerWinterPlain',
+      maxRate: Q(lowerWinterPlainArea, lowerWinterPlainPerimeter),
     });
 
-    // Calculate max A and P for inside of higher summer dyke (i.e. part above lower summer dyke)
-    // hwp = half winter plain
-    const lowerWinterPlainsHeight = summerDykes[1].height;
-    const halfWinterPlainsArea = summerBedArea + halfWinterPlainsWidth * lowerWinterPlainsHeight;
+    // Calculate max A and P for inside of tall summer dyke (i.e. part above lower summer dyke)
+    const lowerWinterPlainsHeight = tallSummerDyke.height;
+    const halfWinterPlainsArea = summerBedArea + winterPlainWidth * lowerWinterPlainsHeight;
     const halfWinterPlainsVerticalPerimeter =
-      2 * summerBedDepth + 2 * summerDykes[0].height + 2 * lowerWinterPlainsHeight;
-    const halfWinterPlainsPermeter = halfWinterPlainsVerticalPerimeter + halfWinterPlainsWidth;
-    flowAreas.push(Q(halfWinterPlainsArea, halfWinterPlainsPermeter));
+      2 * summerBedDepth + 2 * shortSummerDyke.height + 2 * lowerWinterPlainsHeight;
+    const halfWinterPlainsPermeter = halfWinterPlainsVerticalPerimeter + winterPlainWidth;
+    flowAreas.push({ type: 'middleWinterPlain', maxRate: Q(halfWinterPlainsArea, halfWinterPlainsPermeter) });
 
-    // Calculate max A and P for outside of higher summer dyke
+    // Calculate max A and P for outside of tall summer dyke
     const winterPlainsWidth = leftWinterDistance + summerBedWidth + rightWinterDistance;
     const winterPlainsArea = summerBedArea + lowerWinterPlainsHeight * winterPlainsWidth;
     const winterPlainsVerticalPerimeter =
       2 * summerBedDepth + 2 * leftSummerHeight + 2 * rightSummerHeight + 2 * lowerWinterPlainsHeight;
     const winterPlainsPerimeter = winterPlainsVerticalPerimeter + winterPlainsWidth;
-    flowAreas.push({ type: 'lowerWinterPlains', maxRate: Q(winterPlainsArea, winterPlainsPerimeter) });
+    flowAreas.push({ type: 'secondWinterPlain', maxRate: Q(winterPlainsArea, winterPlainsPerimeter) });
   }
 
   // Calculate max A and P to stay within winter dykes
@@ -147,7 +146,7 @@ export default function FlowModel({ state }) {
   const winterPlainsArea = summerBedArea + winterPlainsWidth * winterPlainsHeight;
   const winterPlainsVerticalPerimeter = 2 * summerBedDepth + 4 * summerPlainsHeight + 2 * winterPlainsHeight;
   const winterPlainsPerimeter = winterPlainsVerticalPerimeter + winterPlainsWidth;
-  flowAreas.push({ type: 'lowerHalfWinterPlains', maxRate: Q(winterPlainsArea, winterPlainsPerimeter) });
+  flowAreas.push({ type: 'upperWinterPlains', maxRate: Q(winterPlainsArea, winterPlainsPerimeter) });
 
   // Calculates Flow Rate Q for depth d inside summerbed
   function QSummerBed(d) {
@@ -202,8 +201,53 @@ export default function FlowModel({ state }) {
     return Q(a, p);
   }
 
+  function QLowerWinterPlain(waterLevel) {
+    const width = summerBedWidth + shortSummerDyke.winterDistance + shortSummerDyke.oppositeSummerDistance;
+    const winterPlainWidth = shortSummerDyke.winterDistance - shortSummerDyke.summerDistance;
+    const area = summerPlainsArea + winterPlainWidth * waterLevel;
+    const verticalPerimeter = 2 * summerBedDepth + 2 * summerPlainsHeight + 2 * waterLevel;
+    const perimeter = verticalPerimeter + width;
+
+    return Q(area, perimeter);
+  }
+
+  function QMiddleWinterPlain(waterLevel) {
+    const width = summerBedWidth + shortSummerDyke.winterDistance + shortSummerDyke.oppositeSummerDistance;
+    const area = summerBedArea + width * waterLevel;
+    const verticalPerimeter = 2 * summerBedDepth + 2 * summerPlainsHeight + 2 * waterLevel;
+    const perimeter = verticalPerimeter + width;
+
+    return Q(area, perimeter);
+  }
+
+  function QSecondWinterPlain(waterLevel) {
+    const totalWidth = summerBedWidth + leftWinterDistance + rightWinterDistance;
+    const middleWinterPlainWidth =
+      summerBedWidth + shortSummerDyke.winterDistance + shortSummerDyke.oppositeSummerDistance;
+    const secondWinterPlainWidth = tallSummerDyke.winterDistance - tallSummerDyke.summerDistance;
+
+    const area = summerBedArea + middleWinterPlainWidth * tallSummerDyke.height + secondWinterPlainWidth * waterLevel;
+
+    const verticalPerimeter =
+      2 * summerBedDepth + 2 * shortSummerDyke.height + 2 * tallSummerDyke.height + 2 * waterLevel;
+    const perimeter = verticalPerimeter + totalWidth;
+
+    return Q(area, perimeter);
+  }
+
+  function QUpperWinterPlains(waterLevel) {
+    if (waterLevel <= 0) return waterLevel;
+    const width = summerBedWidth + leftWinterDistance + rightWinterDistance;
+    const area = summerBedArea + width * waterLevel;
+
+    const verticalPerimeter = 2 * summerBedDepth + 2 * leftSummerHeight + 2 * rightSummerHeight + 2 * waterLevel;
+    const perimeter = verticalPerimeter + width;
+
+    return Q(area, perimeter);
+  }
+
   const waterLevels = {
-    // summerBed: 0, // TODO: Currently unused, refactor
+    summerBed: 0,
     summerPlains: 0,
     leftWinterPlain: 0,
     rightWinterPlain: 0,
@@ -216,9 +260,12 @@ export default function FlowModel({ state }) {
 
   if (currentlyFillingFlowArea) {
     if (currentlyFillingFlowArea.type === 'summerBed' || currentlyFillingFlowArea.type === 'summerPlains') {
-      waterLevels.summerPlains = solve(QSummerPlains, flowRate);
+      const waterLevel = solve(QSummerPlains, flowRate);
+      waterLevels.summerBed = Math.min(waterLevel, summerBedDepth);
+      waterLevels.summerPlains = Math.max(waterLevel - summerBedDepth, 0);
     } else {
-      waterLevels.summerPlains = summerPlainsHeight + summerBedDepth;
+      waterLevels.summerBed = summerBedDepth;
+      waterLevels.summerPlains = summerPlainsHeight;
       if (currentlyFillingFlowArea.type === 'lowerWinterPlains') {
         // Equal dykes
         const overflowArea = solve(QLowerWinterPlains, flowRate) - summerPlainsArea;
@@ -239,18 +286,24 @@ export default function FlowModel({ state }) {
 
         waterLevels.leftWinterPlain = leftWinterPlainArea / leftWinterPlainWidth;
         waterLevels.rightWinterPlain = rightWinterPlainArea / rightWinterPlainWidth;
-      } else if (currentlyFillingFlowArea.type === 'jemoeder') {
-        // FIXME
+      } else if (currentlyFillingFlowArea.type === 'lowerWinterPlain') {
+        waterLevels[`${shortSummerDyke.side}WinterPlain`] = solve(QLowerWinterPlain, flowRate);
+      } else if (currentlyFillingFlowArea.type === 'middleWinterPlain') {
+        const waterLevel = solve(QMiddleWinterPlain, flowRate);
+        waterLevels[`${shortSummerDyke.side}WinterPlain`] = waterLevels.summerPlains = waterLevel;
+      } else if (currentlyFillingFlowArea.type === 'secondWinterPlain') {
+        waterLevels[`${shortSummerDyke.side}WinterPlain`] = waterLevels.summerPlains = tallSummerDyke.height;
+        waterLevels[`${tallSummerDyke.side}WinterPlain`] = solve(QSecondWinterPlain, flowRate);
+      } else if (currentlyFillingFlowArea.type === 'upperWinterPlains') {
+        const waterLevel = solve(QUpperWinterPlains, flowRate);
+        waterLevels.leftWinterPlain = waterLevels.middleWinterPlain = waterLevels.rightWinterPlain = waterLevels.summerPlains = waterLevel;
       }
     }
-  } else {
-    // overflow
   }
 
-  console.log(flowAreas);
-  console.log(waterLevels);
   function Sky() {
-    return <rect className="text-blue-300 fill-current w-full h-full" />;
+    const colorClass = currentlyFillingFlowArea ? 'text-blue-300' : 'text-red-300';
+    return <rect className={`${colorClass} fill-current w-full h-full`} />;
   }
   function Ground() {
     return <rect className="text-yellow-900 fill-current h-full w-full" y={_b(summerBedDepth)} />;
@@ -276,9 +329,9 @@ export default function FlowModel({ state }) {
     return (
       <rect
         className="text-blue-800 fill-current h-full"
-        width={_s(summerPlainsWidth + 1 + leftSummerHeight)} // FIXME: Is this correct, or should it be .5lsh + .5rsh?
+        width={_s(summerPlainsWidth + 1 + leftSummerHeight / 2 + rightSummerHeight / 2)} // FIXME: Is this correct, or should it be .5lsh + .5rsh?
         x={_l(leftWinterHeight + leftWinterDistance - leftSummerDistance - leftSummerHeight / 2)}
-        y={_b(waterLevels.summerPlains)}
+        y={_b(summerBedDepth + waterLevels.summerPlains)}
       />
     );
   }
@@ -334,23 +387,24 @@ export default function FlowModel({ state }) {
         <rect
           className="text-blue-800 fill-current w-full h-full"
           mask="url(#flow-area-mask)"
-          y={_b(waterLevels.summerPlains)}
+          y={_b(waterLevels.summerBed)}
         />
       </>
     );
   }
 
+  window.q = QLowerWinterPlain;
+
   return (
-    <div class="flow-model">
+    <div className="flow-model">
       <p>Water level: {waterLevels.summerPlains.toFixed(2)}m</p>
       <p>
         Flow Area: {flowArea.toFixed(2)}m<sup>2</sup>
       </p>
-      <p>Wetted permitere: {wettedPerimeter.toFixed(2)}m</p>
+      <p>Wetted perimeter: {wettedPerimeter.toFixed(2)}m</p>
       <svg className="w-full" viewBox="0 0 1000 500">
         <Sky />
         <LeftWinterPlain />
-        {/* <MiddleWinterPlain /> */}
         <SummerPlains />
         <RightWinterPlain />
         <Dyke side="left" height={leftWinterHeight} distance={leftWinterDistance} />

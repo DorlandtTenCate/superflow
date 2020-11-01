@@ -23,7 +23,7 @@ function App() {
 
   return (
     <>
-      <h1 className="font-bold text-5xl">Superflow v0.1</h1>
+      <h1 className="font-bold text-5xl">Superflow v0.9</h1>
       <div className="md:flex border-t border-gray-400">
         <div className="w-full min-w-40 md:w-2/5 xl:w-1/4 px-4 py-8">
           <Sidebar state={state} />

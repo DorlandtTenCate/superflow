@@ -4,11 +4,11 @@ import Input from './input';
 export default function Sidebar({ state }) {
   const { q, n, s, sbd, sbw, lwh, lwd, lsh, lsd, rsh, rsd, rwh, rwd } = state;
   return (
-    <div class="sidebar">
+    <div className="sidebar">
       <h2 className="font-bold text-2xl">Summer bed</h2>
       <div className="lg:flex">
         <Input
-          className="w-full mr-8"
+          className="w-full"
           label={
             <>
               Flow rate in m<sup>3</sup>/s
@@ -18,7 +18,7 @@ export default function Sidebar({ state }) {
         />
       </div>
       <div className="lg:flex">
-        <Input className="w-full lg:w-1/2" label="Roughness coefficient (Manning)" value={n} />
+        <Input className="w-full lg:w-1/2 mr-8" label="Roughness coefficient (Manning)" value={n} />
         <Input className="w-full lg:w-1/2" label="Slope decline (m/m)" value={s} />
       </div>
 
@@ -26,7 +26,7 @@ export default function Sidebar({ state }) {
         <Input className="w-full lg:w-1/2 mr-8" label="Width of the summer bed in m" value={sbw} />
         <Input className="w-full lg:w-1/2" label="Depth of the summer bed in m" value={sbd} />
       </div>
-      <hr class="mt-4" />
+      <hr className="mt-4" />
       <h2 className="font-bold text-2xl">Dykes</h2>
       <div className="lg:flex">
         <Input className="w-full lg:w-1/2 mr-8" label="Height of left winter dyke" value={lwh} />
@@ -44,7 +44,7 @@ export default function Sidebar({ state }) {
         <Input className="w-full lg:w-1/2 mr-8" label="Height of right winter dyke" value={rwh} />
         <Input className="w-full lg:w-1/2" label="Distance of right winter dyke" value={rwd} />
       </div>
-      <hr class="mt-4" />
+      <hr className="mt-4" />
     </div>
   );
 }
