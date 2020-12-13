@@ -3,13 +3,12 @@ import { solve } from 'solv.js';
 
 export default function FlowModel({ state }) {
   const {
-    lwh: [leftWinterHeight],
+    wh: [winterHeight],
     lwd: [leftWinterDistance],
     lsh: [leftSummerHeight],
     lsd: [leftSummerDistance],
     rsh: [rightSummerHeight],
     rsd: [rightSummerDistance],
-    rwh: [rightWinterHeight],
     rwd: [rightWinterDistance],
     sbd: [summerBedDepth],
     sbw: [summerBedWidth],
@@ -24,10 +23,10 @@ export default function FlowModel({ state }) {
   // * Scaling *
   // ***********
   // Height of highest dyke
-  const maxDykeHeight = Math.max(leftWinterHeight, leftSummerHeight, rightSummerHeight, rightWinterHeight);
+  const maxDykeHeight = Math.max(winterHeight, leftSummerHeight, rightSummerHeight);
 
   const scale = {
-    width: leftWinterHeight + leftWinterDistance + 0.5 + summerBedWidth + 0.5 + rightWinterDistance + rightWinterHeight,
+    width: winterHeight + leftWinterDistance + 0.5 + summerBedWidth + 0.5 + rightWinterDistance + winterHeight,
     height: maxDykeHeight + summerBedDepth + 1,
   };
 
@@ -142,9 +141,8 @@ export default function FlowModel({ state }) {
   }
 
   // Calculate max A and P to stay within winter dykes
-  const winterPlainsHeight = Math.min(leftWinterHeight, rightWinterHeight);
-  const winterPlainsArea = summerBedArea + winterPlainsWidth * winterPlainsHeight;
-  const winterPlainsVerticalPerimeter = 2 * summerBedDepth + 4 * summerPlainsHeight + 2 * winterPlainsHeight;
+  const winterPlainsArea = summerBedArea + winterPlainsWidth * winterHeight;
+  const winterPlainsVerticalPerimeter = 2 * summerBedDepth + 4 * summerPlainsHeight + 2 * winterHeight;
   const winterPlainsPerimeter = winterPlainsVerticalPerimeter + winterPlainsWidth;
   flowAreas.push({ type: 'upperWinterPlains', maxRate: Q(winterPlainsArea, winterPlainsPerimeter) });
 
@@ -184,7 +182,7 @@ export default function FlowModel({ state }) {
     let leftArea = 0.5 * overflowArea;
     let rightArea = 0.5 * overflowArea;
 
-    if (leftArea > leftWinterPlainWidth * leftWinterHeight) {
+    if (leftArea > leftWinterPlainWidth * winterHeight) {
       rightArea += leftArea - leftWinterPlainWidth * summerPlainsHeight;
       leftArea = leftWinterPlainWidth * summerPlainsHeight;
     } else if (rightArea > rightWinterPlainWidth * summerPlainsHeight) {
@@ -314,8 +312,8 @@ export default function FlowModel({ state }) {
         className="text-yellow-800 fill-current"
         cx={
           side === 'left'
-            ? _l(leftWinterHeight + leftWinterDistance - distance - height / 2)
-            : _l(leftWinterHeight + leftWinterDistance + 0.5 + summerBedWidth + 0.5 + distance + height / 2)
+            ? _l(winterHeight + leftWinterDistance - distance - height / 2)
+            : _l(winterHeight + leftWinterDistance + 0.5 + summerBedWidth + 0.5 + distance + height / 2)
         }
         // cx={side === 'left' ? l(lwd - distance) : l(lwd + distance + w)}
         cy={_b(summerBedDepth) + _s(height)}
@@ -330,7 +328,7 @@ export default function FlowModel({ state }) {
       <rect
         className="text-blue-800 fill-current h-full"
         width={_s(summerPlainsWidth + 1 + leftSummerHeight / 2 + rightSummerHeight / 2)} // FIXME: Is this correct, or should it be .5lsh + .5rsh?
-        x={_l(leftWinterHeight + leftWinterDistance - leftSummerDistance - leftSummerHeight / 2)}
+        x={_l(winterHeight + leftWinterDistance - leftSummerDistance - leftSummerHeight / 2)}
         y={_b(summerBedDepth + waterLevels.summerPlains)}
       />
     );
@@ -340,8 +338,8 @@ export default function FlowModel({ state }) {
     return (
       <rect
         className="text-blue-800 fill-current h-full"
-        width={_s(leftWinterHeight / 2 + leftWinterDistance - leftSummerDistance - leftSummerHeight / 2)}
-        x={_l(leftWinterHeight / 2)}
+        width={_s(winterHeight / 2 + leftWinterDistance - leftSummerDistance - leftSummerHeight / 2)}
+        x={_l(winterHeight / 2)}
         y={_b(waterLevels.leftWinterPlain + summerBedDepth)}
       />
     );
@@ -351,15 +349,9 @@ export default function FlowModel({ state }) {
     return (
       <rect
         className="text-blue-800 fill-current h-full"
-        width={_s(rightWinterDistance - rightSummerDistance - rightSummerHeight / 2 + rightWinterHeight / 2)}
+        width={_s(rightWinterDistance - rightSummerDistance - rightSummerHeight / 2 + winterHeight / 2)}
         x={_l(
-          leftWinterHeight +
-            leftWinterDistance +
-            0.5 +
-            summerBedWidth +
-            0.5 +
-            rightSummerDistance +
-            rightSummerHeight / 2
+          winterHeight + leftWinterDistance + 0.5 + summerBedWidth + 0.5 + rightSummerDistance + rightSummerHeight / 2
         )}
         y={_b(waterLevels.rightWinterPlain + summerBedDepth)}
       />
@@ -372,7 +364,7 @@ export default function FlowModel({ state }) {
         <mask id="flow-area-mask">
           <path
             className="text-white h-48 fill-current"
-            d={`M ${_l(leftWinterHeight + leftWinterDistance)} ${_b(summerBedDepth)}
+            d={`M ${_l(winterHeight + leftWinterDistance)} ${_b(summerBedDepth)}
         a ${_s(0.5)} ${_s(0.5)} 0 0 1 ${_s(0.5)} ${_s(0.5)}
         v ${_s(summerBedDepth) - _s(1)}
         a ${_s(0.5)} ${_s(0.5)} 0 0 0 ${_s(0.5)} ${_s(0.5)}
@@ -407,10 +399,10 @@ export default function FlowModel({ state }) {
         <LeftWinterPlain />
         <SummerPlains />
         <RightWinterPlain />
-        <Dyke side="left" height={leftWinterHeight} distance={leftWinterDistance} />
+        <Dyke side="left" height={winterHeight} distance={leftWinterDistance} />
         <Dyke side="left" height={leftSummerHeight} distance={leftSummerDistance} />
         <Dyke side="right" height={rightSummerHeight} distance={rightSummerDistance} />
-        <Dyke side="right" height={rightWinterHeight} distance={rightWinterDistance} />
+        <Dyke side="right" height={winterHeight} distance={rightWinterDistance} />
         <Ground />
         <SummerBed />
         <line id="reference-height" x1="0" y1="950" x2="1000" y2="950" />
